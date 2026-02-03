@@ -3,56 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <title>Yumekawa Focus Timer</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
-  font-family:"Hiragino Maru Gothic ProN",sans-serif;
-  background: linear-gradient(135deg,#ffd6ec,#d6f0ff,#efe1ff);
-  background-size:200% 200%;
-  animation:bgMove 10s ease infinite;
-  text-align:center;
-  padding:40px;
+ font-family:"Hiragino Maru Gothic ProN",sans-serif;
+ background: linear-gradient(135deg,#ffd6ec,#d6f0ff,#efe1ff);
+ background-size:200% 200%;
+ animation:bgMove 10s ease infinite;
+ text-align:center;
+ padding:40px;
 }
 
 @keyframes bgMove{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+ 0%{background-position:0% 50%;}
+ 50%{background-position:100% 50%;}
+ 100%{background-position:0% 50%;}
 }
 
 .container{
-  max-width:420px;
-  margin:auto;
-  background:rgba(255,255,255,0.9);
-  backdrop-filter:blur(10px);
-  padding:30px;
-  border-radius:25px;
-  box-shadow:0 10px 30px rgba(255,150,200,0.25);
+ max-width:420px;
+ margin:auto;
+ background:rgba(255,255,255,0.9);
+ padding:30px;
+ border-radius:25px;
+ box-shadow:0 10px 30px rgba(255,150,200,0.25);
 }
 
-h1{ color:#ff7eb6; }
-
 #timer{
-  font-size:60px;
-  margin:20px 0;
-  font-weight:bold;
-  color:#ff7eb6;
-  text-shadow:0 0 15px rgba(255,150,220,0.5);
+ font-size:60px;
+ margin:20px 0;
+ font-weight:bold;
+ color:#ff7eb6;
 }
 
 button{
-  padding:12px 22px;
-  margin:6px;
-  border:none;
-  border-radius:20px;
-  font-size:16px;
-  cursor:pointer;
-  transition:0.25s;
-}
-
-button:hover{
-  transform:translateY(-3px) scale(1.05);
+ padding:12px 22px;
+ margin:6px;
+ border:none;
+ border-radius:20px;
+ cursor:pointer;
 }
 
 .bgm{ background:#ffe6f2; }
@@ -60,14 +49,14 @@ button:hover{
 .stop{ background:#ffe6e6; }
 
 .sparkle{
-  position:fixed;
-  font-size:20px;
-  animation:spark 1s linear forwards;
+ position:fixed;
+ font-size:20px;
+ animation:spark 1s linear forwards;
 }
 
 @keyframes spark{
-  from{ transform:translateY(0) scale(1); opacity:1;}
-  to{ transform:translateY(-80px) scale(0.5); opacity:0;}
+ from{ transform:translateY(0); opacity:1;}
+ to{ transform:translateY(-80px); opacity:0;}
 }
 </style>
 </head>
@@ -89,70 +78,35 @@ button:hover{
 
 <br>
 
-<button class="start" onclick="startTimer()">▶ タイマースタート</button>
+<button class="start" onclick="startTimer()">▶ タイマー</button>
 <button class="stop" onclick="stopAll()">■ 停止</button>
 
-<br><br>
-
-<iframe
- id="player"
- width="300"
- height="170"
- frameborder="0"
- allow="autoplay; encrypted-media"
- allowfullscreen>
-</iframe>
+<iframe id="player" width="0" height="0" allow="autoplay"></iframe>
 
 </div>
 
 <script>
+let time=25*60;
+let timer=null;
 
-/* ===== タイマー ===== */
-let time = 25 * 60;
-let timer = null;
-
-/* ===== BGM ===== */
-let selectedBGM = "h6VdSjyUbbo";
-
-/* ===== 表示更新 ===== */
 function updateTimer(){
- const min=Math.floor(time/60);
- const sec=time%60;
-
- document.getElementById("timer").textContent =
- String(min).padStart(2,"0")+":"+
- String(sec).padStart(2,"0");
+ const m=Math.floor(time/60);
+ const s=time%60;
+ document.getElementById("timer").textContent=
+ String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
 }
 
-/* ===== BGM選択 → 即再生 ===== */
 function selectBGM(id){
-
- selectedBGM=id;
  createSparkles();
-
- const player=document.getElementById("player");
-
- player.src=
- "https://www.youtube.com/embed/"+id+
- "?autoplay=1&mute=1&loop=1&playlist="+id+
- "&enablejsapi=1";
-
- setTimeout(()=>{
-  player.contentWindow.postMessage(
-  '{"event":"command","func":"unMute","args":""}',
-  '*'
-  );
- },2000);
+ document.getElementById("player").src=
+ "https://www.youtube.com/embed/"+id+"?autoplay=1&mute=1";
 }
 
-/* ===== タイマースタート ===== */
 function startTimer(){
-
  if(timer) return;
 
  time=25*60;
  updateTimer();
- createSparkles();
 
  timer=setInterval(()=>{
   time--;
@@ -163,21 +117,17 @@ function startTimer(){
    timer=null;
    alert("おつかれさま🌙");
   }
-
  },1000);
 }
 
-/* ===== 全停止 ===== */
 function stopAll(){
  clearInterval(timer);
  timer=null;
  document.getElementById("player").src="";
 }
 
-/* ===== キラキラ ===== */
 function createSparkles(){
  const icons=["✨","💫","⭐","🌙"];
-
  for(let i=0;i<8;i++){
   const s=document.createElement("div");
   s.className="sparkle";
@@ -190,8 +140,8 @@ function createSparkles(){
 }
 
 updateTimer();
-
 </script>
 
 </body>
 </html>
+
