@@ -2,48 +2,72 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Focus Timer × YouTube BGM</title>
+<title>Yumekawa Focus Timer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
-  font-family:sans-serif;
-  background:#f4f6fb;
+  font-family:"Hiragino Maru Gothic ProN",sans-serif;
+  background: linear-gradient(135deg,#ffd6ec,#d6f0ff,#efe1ff);
+  background-size:200% 200%;
+  animation:bgMove 10s ease infinite;
   text-align:center;
   padding:40px;
+}
+
+@keyframes bgMove{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 
 .container{
   max-width:420px;
   margin:auto;
-  background:white;
-  padding:25px;
-  border-radius:20px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.1);
+  background:rgba(255,255,255,0.9);
+  backdrop-filter:blur(10px);
+  padding:30px;
+  border-radius:25px;
+  box-shadow:0 10px 30px rgba(255,150,200,0.25);
 }
 
+h1{ color:#ff7eb6; }
+
 #timer{
-  font-size:56px;
+  font-size:60px;
   margin:20px 0;
   font-weight:bold;
+  color:#ff7eb6;
+  text-shadow:0 0 15px rgba(255,150,220,0.5);
 }
 
 button{
-  padding:12px 20px;
+  padding:12px 22px;
   margin:6px;
   border:none;
-  border-radius:12px;
+  border-radius:20px;
   font-size:16px;
   cursor:pointer;
+  transition:0.25s;
 }
 
-.start{ background:#74c0fc; }
-.stop{ background:#ffa8a8; }
-.bgm{ background:#e7f5ff; }
+button:hover{
+  transform:translateY(-3px) scale(1.05);
+}
 
-iframe{
-  margin-top:15px;
-  border-radius:14px;
+.bgm{ background:#ffe6f2; }
+.start{ background:#e6f0ff; }
+.stop{ background:#ffe6e6; }
+
+.sparkle{
+  position:fixed;
+  font-size:20px;
+  animation:spark 1s linear forwards;
+}
+
+@keyframes spark{
+  from{ transform:translateY(0) scale(1); opacity:1;}
+  to{ transform:translateY(-80px) scale(0.5); opacity:0;}
 }
 </style>
 </head>
@@ -56,97 +80,113 @@ iframe{
 
 <div id="timer">25:00</div>
 
-<h3>BGM選択</h3>
+<h3>BGM</h3>
 
-<button class="bgm" onclick="selectBGM('h6VdSjyUbbo')">
-10℃
-</button>
-
-<button class="bgm" onclick="selectBGM('MXyspoCaQls')">
-おひるすぎ
-</button>
-
-<button class="bgm" onclick="selectBGM('2EUvlHJ5UAc')">
-星の降る夜
-</button>
-  
-  <button class="bgm" onclick="selectBGM('Yb-rLsCpBvI')">
-    2:23AM
-  </button>
+<button class="bgm" onclick="selectBGM('h6VdSjyUbbo')">10℃</button>
+<button class="bgm" onclick="selectBGM('MXyspoCaQls')">おひるすぎ</button>
+<button class="bgm" onclick="selectBGM('2EUvlHJ5UAc')">星の降る夜</button>
+<button class="bgm" onclick="selectBGM('Yb-rLsCpBvI')">2:23AM</button>
 
 <br>
 
-<button class="start" onclick="startTimer()">▶ スタート</button>
-<button class="stop" onclick="stopTimer()">■ ストップ</button>
+<button class="start" onclick="startTimer()">▶ タイマースタート</button>
+<button class="stop" onclick="stopAll()">■ 停止</button>
+
+<br><br>
 
 <iframe
-  id="player"
-  width="300"
-  height="170"
-  src=""
-  frameborder="0"
-  allow="autoplay; encrypted-media"
-  allowfullscreen>
+ id="player"
+ width="300"
+ height="170"
+ frameborder="0"
+ allow="autoplay; encrypted-media"
+ allowfullscreen>
 </iframe>
-
 
 </div>
 
 <script>
 
-// ===== タイマー設定 =====
+/* ===== タイマー ===== */
 let time = 25 * 60;
 let timer = null;
 
-// ===== BGM設定 =====
+/* ===== BGM ===== */
 let selectedBGM = "h6VdSjyUbbo";
 
-// ===== タイマー表示更新 =====
+/* ===== 表示更新 ===== */
 function updateTimer(){
-  const min = Math.floor(time / 60);
-  const sec = time % 60;
+ const min=Math.floor(time/60);
+ const sec=time%60;
 
-  document.getElementById("timer").textContent =
-    String(min).padStart(2,"0") + ":" +
-    String(sec).padStart(2,"0");
+ document.getElementById("timer").textContent =
+ String(min).padStart(2,"0")+":"+
+ String(sec).padStart(2,"0");
 }
 
-// ===== BGM選択 =====
+/* ===== BGM選択 → 即再生 ===== */
 function selectBGM(id){
-  selectedBGM = id;
-  alert("BGMを選択しました！");
+
+ selectedBGM=id;
+ createSparkles();
+
+ const player=document.getElementById("player");
+
+ player.src=
+ "https://www.youtube.com/embed/"+id+
+ "?autoplay=1&mute=1&loop=1&playlist="+id+
+ "&enablejsapi=1";
+
+ setTimeout(()=>{
+  player.contentWindow.postMessage(
+  '{"event":"command","func":"unMute","args":""}',
+  '*'
+  );
+ },2000);
 }
 
-// ===== スタート =====
+/* ===== タイマースタート ===== */
 function startTimer(){
 
-  const player = document.getElementById("player");
+ if(timer) return;
 
-  player.src =
-  "https://www.youtube.com/embed/" +
-  selectedBGM +
-  "?autoplay=1&loop=1&playlist=" +
-  selectedBGM;
+ time=25*60;
+ updateTimer();
+ createSparkles();
 
-  if(timer) return;
+ timer=setInterval(()=>{
+  time--;
+  updateTimer();
 
-  timer = setInterval(()=>{
-    time--;
-    updateTimer();
+  if(time<=0){
+   clearInterval(timer);
+   timer=null;
+   alert("おつかれさま🌙");
+  }
 
-    if(time <= 0){
-      clearInterval(timer);
-      timer = null;
-      alert("作業終了！");
-    }
-
-  },1000);
+ },1000);
 }
 
-// ===== ストップ =====
-function stopTimer(){
-  clearInterval(timer);
-  timer = null;
+/* ===== 全停止 ===== */
+function stopAll(){
+ clearInterval(timer);
+ timer=null;
+ document.getElementById("player").src="";
+}
+
+/* ===== キラキラ ===== */
+function createSparkles(){
+ const icons=["✨","💫","⭐","🌙"];
+
+ for(let i=0;i<8;i++){
+  const s=document.createElement("div");
+  s.className="sparkle";
+  s.textContent=icons[Math.floor(Math.random()*icons.length)];
+  s.style.left=Math.random()*100+"vw";
+  s.style.top="60vh";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),1000);
+ }
 }
 
 updateTimer();
