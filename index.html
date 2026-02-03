@@ -1,1 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Focus Timer × YouTube BGM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<style>
+body{
+  font-family:sans-serif;
+  background:#f4f6fb;
+  text-align:center;
+  padding:40px;
+}
+
+.container{
+  max-width:420px;
+  margin:auto;
+  background:white;
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.1);
+}
+
+#timer{
+  font-size:56px;
+  margin:20px 0;
+  font-weight:bold;
+}
+
+button{
+  padding:12px 20px;
+  margin:6px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.start{ background:#74c0fc; }
+.stop{ background:#ffa8a8; }
+.bgm{ background:#e7f5ff; }
+
+iframe{
+  margin-top:15px;
+  border-radius:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎧 Focus Timer</h1>
+
+<div id="timer">25:00</div>
+
+<h3>BGM選択</h3>
+
+<button class="bgm" onclick="selectBGM('h6VdSjyUbbo')">
+10℃
+</button>
+
+<button class="bgm" onclick="selectBGM('MXyspoCaQls')">
+おひるすぎ
+</button>
+
+<button class="bgm" onclick="selectBGM('2EUvlHJ5UAc')">
+星の降る夜
+</button>
+  
+  <button class="bgm" onclick="selectBGM('Yb-rLsCpBvI')">
+    2:23AM
+  </button>
+
+<br>
+
+<button class="start" onclick="startTimer()">▶ スタート</button>
+<button class="stop" onclick="stopTimer()">■ ストップ</button>
+
+<iframe
+  id="player"
+  width="300"
+  height="170"
+  src=""
+  frameborder="0"
+  allow="autoplay; encrypted-media"
+  allowfullscreen>
+</iframe>
+
+
+</div>
+
+<script>
+
+// ===== タイマー設定 =====
+let time = 25 * 60;
+let timer = null;
+
+// ===== BGM設定 =====
+let selectedBGM = "h6VdSjyUbbo";
+
+// ===== タイマー表示更新 =====
+function updateTimer(){
+  const min = Math.floor(time / 60);
+  const sec = time % 60;
+
+  document.getElementById("timer").textContent =
+    String(min).padStart(2,"0") + ":" +
+    String(sec).padStart(2,"0");
+}
+
+// ===== BGM選択 =====
+function selectBGM(id){
+  selectedBGM = id;
+  alert("BGMを選択しました！");
+}
+
+// ===== スタート =====
+function startTimer(){
+
+  const player = document.getElementById("player");
+
+  player.src =
+  "https://www.youtube.com/embed/" +
+  selectedBGM +
+  "?autoplay=1&loop=1&playlist=" +
+  selectedBGM;
+
+  if(timer) return;
+
+  timer = setInterval(()=>{
+    time--;
+    updateTimer();
+
+    if(time <= 0){
+      clearInterval(timer);
+      timer = null;
+      alert("作業終了！");
+    }
+
+  },1000);
+}
+
+// ===== ストップ =====
+function stopTimer(){
+  clearInterval(timer);
+  timer = null;
+}
+
+updateTimer();
+
+</script>
+
+</body>
+</html>
